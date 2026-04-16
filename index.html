@@ -1373,10 +1373,22 @@
             <div id="chat-messages"></div>
           </div>
           
-          <div class="terminal-input-container">
+          <div class="terminal-input-container" style="position: relative;">
             <span class="prompt">$</span>
             <input type="text" id="chat-input" placeholder="Ask about ActiveCampaign..." disabled>
             <button id="send-btn" disabled>Send</button>
+            
+            <!-- TRANSPARENT OVERLAY FOR CLICKS -->
+            <div id="input-click-overlay" style="
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background: transparent;
+              cursor: text;
+              z-index: 10;
+            " onclick="overlayClicked()" title="Click to enter email and start chatting"></div>
           </div>
           
           <div class="terminal-footer">
@@ -1635,44 +1647,69 @@
     document.addEventListener('DOMContentLoaded', function() {
       console.log('Terminal initializing...');
       
+      // Get elements (fixing duplicate declarations)
       const chatInput = document.getElementById('chat-input');
+      const inputContainer = document.querySelector('.terminal-input-container');
+      const promptSpan = document.querySelector('.prompt');
+      
+      if (!chatInput) {
+        console.error('Chat input not found!');
+        return;
+      }
       
       // Make disabled input clickable
       chatInput.style.pointerEvents = 'auto';
       chatInput.style.cursor = 'text';
       
-      // Make the entire input container clickable
-      const inputContainer = document.querySelector('.terminal-input-container');
-      
-      // Show email modal on click anywhere in the input area
-      inputContainer.addEventListener('click', function() {
-        console.log('Input container clicked, userEmail:', userEmail);
-        if (!userEmail) {
-          console.log('Showing email modal');
-          showEmailModal();
-        }
-      });
-      
-      // Also handle clicks directly on the input field
+      // Handler 1: Direct input click
       chatInput.addEventListener('click', function(e) {
-        console.log('Input field clicked, userEmail:', userEmail);
         if (!userEmail) {
-          console.log('Showing email modal from input');
+          e.preventDefault();
+          e.stopPropagation();
           showEmailModal();
-          e.stopPropagation(); // Prevent double modal
         }
       });
       
-      // Also handle focus as backup (for when input becomes enabled)
-      chatInput.addEventListener('focus', function() {
+      // Handler 2: Input container click
+      if (inputContainer) {
+        inputContainer.addEventListener('click', function(e) {
+          if (!userEmail && (e.target === chatInput || e.target === this)) {
+            e.preventDefault();
+            e.stopPropagation();
+            showEmailModal();
+          }
+        });
+      }
+      
+      // Handler 3: Prompt span click (the $ symbol)
+      if (promptSpan) {
+        promptSpan.addEventListener('click', function(e) {
+          if (!userEmail) {
+            e.preventDefault();
+            e.stopPropagation();
+            showEmailModal();
+          }
+        });
+      }
+      
+      // Handler 4: Mousedown events (sometimes more reliable than click)
+      chatInput.addEventListener('mousedown', function(e) {
         if (!userEmail) {
           showEmailModal();
+        }
+      });
+      
+      // Also handle focus events on disabled input
+      chatInput.addEventListener('focus', function(e) {
+        if (!userEmail && this.disabled) {
+          e.preventDefault();
           this.blur();
+          showEmailModal();
         }
       });
  
       // Handle Enter key
-      document.getElementById('chat-input').addEventListener('keypress', function(e) {
+      chatInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
           e.preventDefault();
           sendMessage();
@@ -1680,15 +1717,49 @@
       });
  
       // Send button click
-      document.getElementById('send-btn').addEventListener('click', sendMessage);
+      const sendBtn = document.getElementById('send-btn');
+      if (sendBtn) {
+        sendBtn.addEventListener('click', sendMessage);
+      }
+      
+      console.log('Terminal ready');
     });
  
     function showEmailModal() {
-      document.getElementById('email-modal').style.display = 'flex';
+      console.log('Email modal requested');
+      const modal = document.getElementById('email-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+      } else {
+        console.error('Email modal not found');
+      }
+    }
+    
+    // OVERLAY CLICK FUNCTION
+    function overlayClicked() {
+      console.log('Input area clicked');
+      if (!userEmail) {
+        showEmailModal();
+      }
+    }
+    
+    // Remove the click overlay when email is entered
+    function removeClickOverlay() {
+      const overlay = document.getElementById('input-click-overlay');
+      if (overlay) {
+        overlay.style.display = 'none';
+      }
     }
  
     function closeEmailModal() {
-      document.getElementById('email-modal').style.display = 'none';
+      console.log('❌ closeEmailModal() called');
+      const modal = document.getElementById('email-modal');
+      if (modal) {
+        modal.style.display = 'none';
+        console.log('✅ Email modal closed');
+      } else {
+        console.error('❌ Email modal element not found for closing!');
+      }
     }
  
     function submitEmail(event) {
@@ -1712,16 +1783,26 @@
       document.getElementById('send-btn').disabled = false;
       document.getElementById('chat-input').placeholder = 'Ask about ActiveCampaign...';
       document.getElementById('chat-input').focus();
+      
+      // Remove the click overlay since input is now active
+      removeClickOverlay();
     }
  
     function askSuggestion(question) {
+      console.log('Suggestion clicked:', question);
+      
       if (!userEmail) {
         showEmailModal();
         return;
       }
       
-      document.getElementById('chat-input').value = question;
-      sendMessage();
+      const input = document.getElementById('chat-input');
+      if (input) {
+        input.value = question;
+        sendMessage();
+      } else {
+        console.error('Chat input not found');
+      }
     }
  
     async function sendMessage() {
@@ -1823,3 +1904,4 @@
   </script>
 </body>
 </html>
+ 
