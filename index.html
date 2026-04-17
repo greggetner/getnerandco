@@ -428,7 +428,7 @@
     line-height: 1.6;
     color: #00ff41;
     overflow-y: auto;
-    max-height: 400px;
+    max-height: 560px;
   }
  
   .boot-sequence .boot-line {
@@ -443,8 +443,8 @@
   .boot-sequence .boot-line:nth-child(4) { animation-delay: 2.0s; }
   .boot-sequence .boot-line:nth-child(5) { animation-delay: 2.6s; }
   .boot-sequence .boot-line:nth-child(6) { animation-delay: 3.2s; }
-  .boot-sequence .suggestions { animation-delay: 3.8s; }
-  .boot-sequence .ready { animation-delay: 4.6s; }
+  .boot-sequence .suggestions { animation-delay: 3.2s; }
+  .boot-sequence .ready { animation-delay: 3.8s; }
  
   @keyframes typewriter {
     from { opacity: 0; transform: translateX(-10px); }
@@ -539,8 +539,14 @@
     justify-content: space-between;
     align-items: center;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: #888;
+    font-size: 14px;
+    color: #00ff41;
+  }
+
+  #status-text.status-placeholder {
+    font-size: 13px;
+    color: #c8c8c8;
+    font-style: italic;
   }
  
   .typing-indicator {
@@ -583,6 +589,36 @@
     color: #ffa500;
     margin-left: 16px;
     line-height: 1.8;
+    white-space: pre-wrap;
+  }
+
+  .typing-cursor {
+    display: inline-block;
+    color: #ffa500;
+    margin-left: 1px;
+    animation: cursor-blink 1s step-end infinite;
+  }
+
+  @keyframes cursor-blink {
+    50% { opacity: 0; }
+  }
+
+  .message.system {
+    color: #ffa500;
+    margin-left: 16px;
+    line-height: 1.8;
+    white-space: pre-wrap;
+  }
+
+  .message.system a {
+    color: #00ff41;
+    text-decoration: underline;
+    font-weight: 600;
+  }
+
+  .message.system a:hover {
+    color: #ffffff;
+    background: rgba(0, 255, 65, 0.15);
   }
  
   .probe-brain-cta {
@@ -625,9 +661,8 @@
  
   .modal-header {
     padding: 24px 24px 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    position: relative;
+    text-align: center;
   }
  
   .modal-header h3 {
@@ -639,6 +674,9 @@
   }
  
   .modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
     background: none;
     border: none;
     font-size: 24px;
@@ -665,20 +703,42 @@
     color: var(--ink-soft);
     margin-bottom: 24px;
     line-height: 1.6;
+    text-align: center;
+  }
+
+  #pending-question-hint {
+    color: var(--ink);
+    background: rgba(255, 165, 0, 0.12);
+    border-left: 3px solid #ffa500;
+    padding: 10px 14px;
+    border-radius: 4px;
+    margin: 0 0 24px !important;
+    font-style: normal;
+    font-size: 14px;
+    text-align: left;
+  }
+
+  #pending-question-hint #pending-question-text {
+    font-weight: 600;
   }
  
   #email-form {
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 16px;
   }
  
   #user-email {
+    width: 100%;
+    max-width: 360px;
     padding: 16px;
     border: 2px solid var(--line);
     border-radius: 6px;
     font-size: 16px;
     font-family: 'Inter Tight', sans-serif;
+    text-align: center;
+    box-sizing: border-box;
     transition: border-color 0.2s;
   }
  
@@ -1350,7 +1410,7 @@
             <span class="dot yellow"></span>
             <span class="dot green"></span>
           </div>
-          <div class="terminal-title">greg@getner-ai: probe-my-brain</div>
+          <div class="terminal-title">greg@getner.ai: probe-my-brain</div>
         </div>
         
         <div class="terminal-content">
@@ -1358,17 +1418,16 @@
             <div class="boot-sequence">
               <div class="boot-line">$ probe my brain</div>
               <div class="boot-line">> Initializing expertise...</div>
-              <div class="boot-line">> Contemplating tacos</div>
-              <div class="boot-line">> Loading ActiveCampaign knowledge</div>
-              <div class="boot-line">> 23 years of experience ready</div>
-              <div class="boot-line">> Ask me anything about:</div>
+              <div class="boot-line">> Contemplating tacos...</div>
+              <div class="boot-line">> Loading ActiveCampaign knowledge...</div>
+              <div class="boot-line">> Click to ask:</div>
               <div class="suggestions">
                 <span class="suggestion" onclick="askSuggestion('How do I improve email deliverability?')">• Email deliverability</span>
                 <span class="suggestion" onclick="askSuggestion('What\'s the best segmentation strategy?')">• List segmentation</span>
                 <span class="suggestion" onclick="askSuggestion('Help me design a welcome series')">• Welcome sequences</span>
                 <span class="suggestion" onclick="askSuggestion('How do I prevent emails going to spam?')">• Spam prevention</span>
               </div>
-              <div class="boot-line ready">$ ready for your questions</div>
+              <div class="boot-line ready">$ ask me anything</div>
             </div>
             <div id="chat-messages"></div>
           </div>
@@ -1393,7 +1452,7 @@
           
           <div class="terminal-footer">
             <div class="terminal-status">
-              <span id="status-text">Enter email to start probing...</span>
+              <span id="status-text" class="status-placeholder">click a button or type your question to start probing...</span>
               <div class="typing-indicator" id="typing" style="display: none;">
                 <span></span><span></span><span></span>
               </div>
@@ -1416,11 +1475,14 @@
   <div id="email-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>Access Greg's AI Brain</h3>
+        <h3>Access Greg's Massive Brain</h3>
         <button class="modal-close" onclick="closeEmailModal()">&times;</button>
       </div>
       <div class="modal-body">
         <p>Get instant access to 23 years of ActiveCampaign expertise. Ask up to 5 questions to see how I solve problems.</p>
+        <p id="pending-question-hint" style="display: none;">
+          Enter email to ask: &ldquo;<span id="pending-question-text"></span>&rdquo;
+        </p>
         <form id="email-form" onsubmit="submitEmail(event)">
           <input type="email" id="user-email" placeholder="your@email.com" required>
           <button type="submit" class="btn-primary">Start Probing</button>
@@ -1642,6 +1704,8 @@
     const maxMessages = 5;
     let userEmail = null;
     let isTyping = false;
+    const conversationHistory = [];
+    let pendingSuggestion = null;
  
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
@@ -1760,17 +1824,34 @@
       } else {
         console.error('❌ Email modal element not found for closing!');
       }
+      // If the modal is dismissed without submitting, drop any queued suggestion
+      // so it doesn't surprise-send later. Auto-send path runs before this close.
+      if (!userEmail) {
+        pendingSuggestion = null;
+        const hint = document.getElementById('pending-question-hint');
+        if (hint) hint.style.display = 'none';
+      }
     }
  
     function submitEmail(event) {
       event.preventDefault();
       const email = document.getElementById('user-email').value;
-      
+
       if (email && isValidEmail(email)) {
         userEmail = email;
         closeEmailModal();
         enableChat();
         updateStatus(`Connected as ${email} • ${maxMessages - messageCount} questions remaining`);
+
+        if (pendingSuggestion) {
+          const queued = pendingSuggestion;
+          pendingSuggestion = null;
+          const input = document.getElementById('chat-input');
+          if (input) {
+            input.value = queued;
+            sendMessage();
+          }
+        }
       }
     }
  
@@ -1790,12 +1871,19 @@
  
     function askSuggestion(question) {
       console.log('Suggestion clicked:', question);
-      
+
       if (!userEmail) {
+        pendingSuggestion = question;
+        const hint = document.getElementById('pending-question-hint');
+        const hintText = document.getElementById('pending-question-text');
+        if (hint && hintText) {
+          hintText.textContent = question;
+          hint.style.display = 'block';
+        }
         showEmailModal();
         return;
       }
-      
+
       const input = document.getElementById('chat-input');
       if (input) {
         input.value = question;
@@ -1813,11 +1901,15 @@
         const message = input.value.trim();
         
         if (!message) return;
-        
+
         console.log('📝 Message to send:', message);
-        
+
         // Clear input and show user message
         input.value = '';
+        if (messageCount === 0) {
+          const bootSeq = document.querySelector('.boot-sequence');
+          if (bootSeq) bootSeq.style.display = 'none';
+        }
         addMessage(message, 'user');
         messageCount++;
         
@@ -1836,36 +1928,34 @@
                 body: JSON.stringify({
                     message: message,
                     email: userEmail,
-                    messageCount: messageCount
+                    messageCount: messageCount,
+                    history: conversationHistory
                 })
             });
             
             console.log('📡 Response status:', response.status);
             console.log('📡 Response ok:', response.ok);
-            
-            if (!response.ok) {
-                throw new Error(`Server error: ${response.status}`);
-            }
-            
-            // Get the raw response text first
+
+            // Read the body regardless of status so we can surface server-provided error messages.
             const responseText = await response.text();
             console.log('📄 Raw response text:', responseText);
-            
-            // Try to parse as JSON
+
             let data;
             try {
                 data = JSON.parse(responseText);
                 console.log('📊 Parsed JSON data:', data);
             } catch (parseError) {
                 console.error('💥 JSON Parse error:', parseError);
-                console.log('📄 Failed to parse this text:', responseText);
                 throw new Error('Invalid JSON response from server');
             }
-            
-            // Check for error in response
-            if (data.error) {
-                console.log('❌ Error from function:', data.error);
-                throw new Error(data.error);
+
+            if (!response.ok || data.error) {
+                if (data.limitReached) {
+                    endSessionWithCTA();
+                    setTyping(false);
+                    return;
+                }
+                throw new Error(data.error || `Server error: ${response.status}`);
             }
             
             // DEBUG: Show all properties of the response
@@ -1874,29 +1964,29 @@
             console.log('🔍 data.response value:', data.response);
             console.log('🔍 typeof data.response:', typeof data.response);
             
-            // Try to add the AI response
-            if (data.response) {
-                console.log('✅ data.response is truthy, calling addMessage');
-                addMessage(data.response, 'assistant');
-                console.log('✅ addMessage completed');
-            } else {
-                console.log('❌ data.response is falsy');
-                console.log('🔍 Attempting to find response in other fields...');
-                
-                // Check alternative response fields
-                if (data.text) {
-                    console.log('📝 Found data.text:', data.text);
-                    addMessage(data.text, 'assistant');
-                } else if (data.message) {
-                    console.log('📝 Found data.message:', data.message);
-                    addMessage(data.message, 'assistant');
-                } else if (data.content) {
-                    console.log('📝 Found data.content:', data.content);
-                    addMessage(data.content, 'assistant');
-                } else {
-                    console.log('❌ No recognizable response field found');
-                    addMessage('Response received but could not extract text. Check console for details.', 'assistant');
-                }
+            // Swap the "thinking" footer indicator for the inline typing cursor,
+            // and lock input so a second send can't start mid-animation.
+            setTyping(false);
+            const chatInputEl = document.getElementById('chat-input');
+            const sendBtnEl = document.getElementById('send-btn');
+            chatInputEl.disabled = true;
+            sendBtnEl.disabled = true;
+
+            const assistantText =
+              data.response ?? data.text ?? data.message ?? data.content ??
+              'Response received but could not extract text. Check console for details.';
+            setStatusPlaceholder('Wisdom dispensing...');
+            await typeMessage(assistantText, 'assistant');
+
+            conversationHistory.push(
+              { role: 'user', content: message },
+              { role: 'assistant', content: assistantText }
+            );
+
+            if (messageCount < maxMessages) {
+              chatInputEl.disabled = false;
+              sendBtnEl.disabled = false;
+              chatInputEl.focus();
             }
             
             // Update status based on remaining questions
@@ -1904,10 +1994,7 @@
             if (remaining > 0) {
                 updateStatus(`${remaining} questions remaining`);
             } else {
-                updateStatus('Session complete • Ready to work together?');
-                document.getElementById('chat-input').disabled = true;
-                document.getElementById('send-btn').disabled = true;
-                document.getElementById('chat-input').placeholder = 'Session complete - contact me to continue!';
+                endSessionWithCTA();
             }
             
         } catch (error) {
@@ -1925,20 +2012,74 @@
       messageDiv.className = `message ${type}`;
       messageDiv.textContent = text;
       messagesDiv.appendChild(messageDiv);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      const scrollContainer = messagesDiv.closest('.terminal-output');
+      if (scrollContainer) scrollContainer.scrollTop = scrollContainer.scrollHeight;
+    }
+
+    // Renders a trusted HTML string into the chat. NEVER pass AI-generated or
+    // user-generated content here — innerHTML would be an XSS vector. Hardcoded
+    // templates only (e.g. session-complete CTA with a known calendar link).
+    function addSystemMessage(trustedHtml) {
+      const messagesDiv = document.getElementById('chat-messages');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'message system';
+      messageDiv.innerHTML = trustedHtml;
+      messagesDiv.appendChild(messageDiv);
+      const scrollContainer = messagesDiv.closest('.terminal-output');
+      if (scrollContainer) scrollContainer.scrollTop = scrollContainer.scrollHeight;
+    }
+
+    function endSessionWithCTA() {
+      addSystemMessage(
+        'Session complete. Ready to solve your real ActiveCampaign challenges? ' +
+        '<a href="https://calendly.com/getner/activecampaign-strategy-session" target="_blank" rel="noopener noreferrer">Book a 30-minute strategy session</a> ' +
+        'to get personalized solutions for your business.'
+      );
+      updateStatus('Session complete • Ready to work together?');
+      const input = document.getElementById('chat-input');
+      const btn = document.getElementById('send-btn');
+      input.disabled = true;
+      btn.disabled = true;
+      input.placeholder = 'Session complete — book a call to continue';
+    }
+
+    async function typeMessage(text, type, charDelayMs = 15) {
+      const messagesDiv = document.getElementById('chat-messages');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${type}`;
+      const textNode = document.createTextNode('');
+      const cursor = document.createElement('span');
+      cursor.className = 'typing-cursor';
+      cursor.textContent = '▌';
+      messageDiv.appendChild(textNode);
+      messageDiv.appendChild(cursor);
+      messagesDiv.appendChild(messageDiv);
+      const scrollContainer = messagesDiv.closest('.terminal-output');
+      for (let i = 0; i < text.length; i++) {
+        textNode.data += text[i];
+        if (scrollContainer) scrollContainer.scrollTop = scrollContainer.scrollHeight;
+        await new Promise(r => setTimeout(r, charDelayMs));
+      }
+      cursor.remove();
     }
  
     function updateStatus(text) {
-      document.getElementById('status-text').textContent = text;
+      setStatusPlaceholder(text);
+    }
+
+    function setStatusPlaceholder(text) {
+      const el = document.getElementById('status-text');
+      el.textContent = text;
+      el.classList.add('status-placeholder');
     }
  
     function setTyping(typing) {
       isTyping = typing;
       const typingIndicator = document.getElementById('typing');
       typingIndicator.style.display = typing ? 'flex' : 'none';
-      
+
       if (typing) {
-        document.getElementById('status-text').textContent = 'Greg is thinking...';
+        setStatusPlaceholder('Greg is thinking...');
       }
     }
   </script>

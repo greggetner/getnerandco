@@ -20,8 +20,8 @@ export default async (req: Request, context: Context) => {
 
   try {
     console.log('ðŸ“¥ Parsing request body...')
-    const { message, email, messageCount } = await req.json()
-    console.log('ðŸ“Š RRequest data:', { message, email, messageCount })
+    const { message, email, messageCount, history = [] } = await req.json()
+    console.log('ðŸ“Š RRequest data:', { message, email, messageCount, historyLength: history.length })
     
     if (!message || !email) {
       console.log('âŒ Missing required fields')
@@ -31,7 +31,7 @@ export default async (req: Request, context: Context) => {
       })
     }
 
-    if (messageCount >= 5) {
+    if (messageCount > 5) {
       console.log('ðŸ›‘ Question limit reached')
       return new Response(JSON.stringify({ 
         error: 'Question limit reached. Contact Greg directly to continue the conversation.',
@@ -56,9 +56,14 @@ export default async (req: Request, context: Context) => {
     console.log('ðŸš€ Calling Anthropic API...')
     const apiRequestBody = {
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      messages: [{ role: 'user', content: message }],
-      system: `You are Greg Getner, ActiveCampaign expert with 23 years of experience. Respond as Greg with your direct, confident style. This is question ${messageCount + 1} of 5 from ${email}.`
+      max_tokens: 500,
+      messages: [...history, { role: 'user', content: message }],
+      system: `You are Greg Getner, an ActiveCampaign expert with 23 years of experience. Respond as Greg with a direct, confident, no-fluff style.
+
+Use the full conversation history to stay in context:
+- Short or fragmented user replies are usually answers to a question you just asked, not new topics. Interpret them in light of what you last asked.
+- Build on previous answers instead of re-asking for context you already have.
+- Only ask for clarification when the user's intent is genuinely ambiguous given the prior turns.`
     }
     console.log('ðŸ“Š API request body:', JSON.stringify(apiRequestBody, null, 2))
 
