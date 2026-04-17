@@ -1805,79 +1805,81 @@
       }
     }
  
-    async function sendMessage() {
-      if (isTyping || messageCount >= maxMessages) return;
-      
-      const input = document.getElementById('chat-input');
-      const message = input.value.trim();
-      
-      if (!message) return;
-      
-      // Add user message
-      addMessage(message, 'user');
-      input.value = '';
-      messageCount++;
-      
-      // Update status
-      updateStatus(`Probing brain...`);
-      setTyping(true);
-      
-      try {
-        // Call your Netlify function (we'll create this)
+async function sendMessage() {
+    console.log('🚀 sendMessage called');
+    
+    const input = document.getElementById('chat-input');
+    const terminal = document.getElementById('terminal');
+    const message = input.value.trim();
+    
+    if (!message) return;
+    
+    console.log('📝 Message to send:', message);
+    
+    // Clear input
+    input.value = '';
+    
+    // Show user message
+    addMessage(message, 'user');
+    messageCount++;
+    
+    // Update status
+    updateStatus('Probing brain...');
+    setTyping(true);
+    
+    try {
+        console.log('🌐 Making fetch request to probe-brain function');
+        
         const response = await fetch('/.netlify/functions/probe-brain', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            message: message,
-            email: userEmail,
-            messageCount: messageCount
-          })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: message,
+                email: userEmail,
+                messageCount: messageCount
+            })
         });
- 
-        const data = await response.json();
+        
+        console.log('📡 Response status:', response.status);
         
         if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error('404: Function not found - AI brain needs to be deployed first!');
-          }
-          throw new Error(data.error || `Server error: ${response.status}`);
+            if (response.status === 404) {
+                throw new Error('404: Function not found - AI brain needs to be deployed first!');
+            }
+            throw new Error(`Server error: ${response.status}`);
         }
+        
+        const data = await response.json();
+        console.log('📊 Response data:', data);
         
         if (data.error) {
-          throw new Error(data.error);
+            console.log('❌ Error from function:', data.error);
+            throw new Error(data.error);
         }
         
-        // Add assistant response
-        addMessage(data.response, 'assistant');
-        
-        // Update status
-        const remaining = maxMessages - messageCount;
-        if (remaining > 0) {
-          updateStatus(`${remaining} questions remaining`);
-        } else {
-          updateStatus('Session complete • Ready to work together?');
-          document.getElementById('chat-input').disabled = true;
-          document.getElementById('send-btn').disabled = true;
-          document.getElementById('chat-input').placeholder = 'Session complete - contact me to continue!';
+        // Add AI response - THIS IS THE KEY FIX
+        if (data.response) {
+            console.log('🧠 Displaying AI response');
+            addMessage(data.response, 'assistant');
+            
+            // Update status
+            const remaining = maxMessages - messageCount;
+            if (remaining > 0) {
+                updateStatus(`${remaining} questions remaining`);
+            } else {
+                updateStatus('Session complete • Ready to work together?');
+                document.getElementById('chat-input').disabled = true;
+                document.getElementById('send-btn').disabled = true;
+                document.getElementById('chat-input').placeholder = 'Session complete - contact me to continue!';
+            }
         }
         
-      } catch (error) {
-        console.error('Error:', error);
+    } catch (error) {
+        console.error('💥 Fetch error:', error);
         
-        // Check if this is a 404 error (function not found)
-        if (error.message && error.message.includes('404')) {
-          addMessage('My AI brain is still booting up! The backend function needs to be deployed first. Contact me directly at greg@getgetner.com in the meantime.', 'assistant');
-          updateStatus('AI brain offline • Email greg@getgetner.com');
-        } else {
-          addMessage('Sorry, I encountered an error. Please try again or contact me directly at greg@getgetner.com', 'assistant');
-          updateStatus('Error occurred • Please try again');
-        }
-      }
-      
-      setTyping(false);
-    }
+        // Check if this is a 404 error
  
     function addMessage(text, type) {
       const messagesDiv = document.getElementById('chat-messages');
