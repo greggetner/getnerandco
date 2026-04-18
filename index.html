@@ -201,6 +201,46 @@
     box-shadow: 0 12px 32px rgba(22,20,18,0.2);
     border: 1px solid var(--line);
   }
+
+  /* Portrait stage = photo ↔ video crossfade container.
+     Both img and video fill the stage via object-fit: cover; the stage
+     owns the border/radius/shadow so the transition has no visual seams. */
+  .portrait-stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1368 / 1828;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    box-shadow: 0 12px 32px rgba(22,20,18,0.2);
+    background: var(--paper-deep);
+  }
+
+  .portrait-stage > .portrait,
+  .portrait-stage > .portrait-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    transition: opacity 0.5s ease;
+  }
+
+  .portrait-stage > .portrait-video {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .portrait-stage.dancing > .portrait-video {
+    opacity: 1;
+  }
+
+  .portrait-stage.dancing > .portrait {
+    opacity: 0;
+  }
  
   .portrait-caption {
     font-family: 'JetBrains Mono', monospace;
@@ -1796,8 +1836,13 @@
     </div>
  
     <div class="hero-image">
-      <img src="assets/images/greg-getner-photo.png" alt="Greg Getner" class="portrait" id="greg-portrait">
-      <button type="button" class="dance-btn">Make Me Dance! 🕺</button>
+      <div class="portrait-stage" id="portrait-stage">
+        <img src="assets/images/greg-getner-photo.png" alt="Greg Getner" class="portrait" id="greg-portrait">
+        <video id="greg-video" class="portrait-video" muted playsinline preload="none" aria-label="Greg dancing ballet">
+          <source src="assets/videos/greg-ballet.mp4" type="video/mp4">
+        </video>
+      </div>
+      <button type="button" class="dance-btn" id="dance-btn">Make Me Dance! 🕺</button>
     </div>
   </main>
  
@@ -1863,7 +1908,7 @@
     <div class="probe-brain-container">
       <div class="probe-brain-header">
         <h2>Probe My Brain 🧠</h2>
-        <p class="subtitle">My AI doppelganger is ready to serve you</p>
+        <p class="subtitle">My AI doppelganger is ready to serve you. Click on any button or type below to get started.</p>
       </div>
       
       <div class="terminal-container">
@@ -2337,7 +2382,7 @@
     </div>
     
     <div class="footer-bottom">
-      <p>Built with ❤️ by Greg &amp; Claude. Deployed to Netlify.</p>
+      <p>Built with ❤️ by Greg &amp; Claude. <span style="white-space: nowrap;">Deployed to Netlify.</span></p>
       <p>&copy; 2026 Getner &amp; AI. All rights reserved.</p>
     </div>
   </footer>
@@ -2517,6 +2562,47 @@
     let pendingSuggestion = null;
  
     // Initialize on page load
+    // ───────── Portrait ↔ dance-video crossfade ─────────
+    (function () {
+      const stage = document.getElementById('portrait-stage');
+      const video = document.getElementById('greg-video');
+      const btn = document.getElementById('dance-btn');
+      if (!stage || !video || !btn) return;
+
+      const IDLE_LABEL = 'Make Me Dance! 🕺';
+
+      function reset() {
+        stage.classList.remove('dancing');
+        btn.disabled = false;
+        btn.textContent = IDLE_LABEL;
+      }
+
+      btn.addEventListener('click', async () => {
+        btn.disabled = true;
+        btn.textContent = 'Loading…';
+        try {
+          // Kick off the load now (preload="none" means it hasn't started yet)
+          if (video.readyState < 2) {
+            video.load();
+            await new Promise((resolve, reject) => {
+              video.addEventListener('canplay', resolve, { once: true });
+              video.addEventListener('error', reject, { once: true });
+            });
+          }
+          video.currentTime = 0;
+          await video.play();
+          stage.classList.add('dancing');
+          btn.textContent = 'Dancing…';
+        } catch (err) {
+          console.warn('Dance video play failed:', err);
+          reset();
+        }
+      });
+
+      video.addEventListener('ended', reset);
+      video.addEventListener('error', reset);
+    })();
+
     document.addEventListener('DOMContentLoaded', function() {
       console.log('Terminal initializing...');
       
