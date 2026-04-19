@@ -569,6 +569,24 @@
     margin-bottom: 32px;
   }
 
+  .probe-brain-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: #00ff41;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding: 7px 14px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 999px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
   .subtitle-arrow {
     font-family: 'JetBrains Mono', monospace;
     font-size: 32px;
@@ -635,6 +653,35 @@
     color: #888;
     font-weight: 500;
   }
+
+  .live-indicator {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: #00ff41;
+    letter-spacing: 0.8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #00ff41;
+    box-shadow: 0 0 6px rgba(0, 255, 65, 0.7);
+    animation: live-pulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes live-pulse {
+    0%, 100% { opacity: 0.4; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .live-dot { animation: none; opacity: 1; }
+  }
  
   .terminal-content {
     background: #1a1a1a;
@@ -667,7 +714,12 @@
   .boot-sequence .boot-line:nth-child(5) { animation-delay: 2.6s; }
   .boot-sequence .boot-line:nth-child(6) { animation-delay: 3.2s; }
   .boot-sequence .suggestions { animation-delay: 3.2s; }
-  .boot-sequence .ready { animation-delay: 3.8s; }
+  .boot-sequence .ready {
+    animation-delay: 3.8s;
+    font-weight: 700;
+    color: #ffd27f;
+    margin-top: 8px;
+  }
  
   @keyframes typewriter {
     from { opacity: 0; transform: translateX(-10px); }
@@ -1989,6 +2041,7 @@
   <section class="probe-brain">
     <div class="probe-brain-container">
       <div class="probe-brain-header">
+        <div class="probe-brain-eyebrow" aria-hidden="true"><span class="live-dot"></span>LIVE · INTERACTIVE</div>
         <h2>Probe My Brain 🧠</h2>
         <p class="subtitle">My AI doppelganger is ready to serve you.<br>Click on any button or type below to get started.</p>
         <div class="subtitle-arrow" aria-hidden="true">↓</div>
@@ -2002,6 +2055,7 @@
             <span class="dot green"></span>
           </div>
           <div class="terminal-title">greg@getner.ai: probe-my-brain</div>
+          <span class="live-indicator" aria-hidden="true"><span class="live-dot"></span>LIVE</span>
         </div>
         
         <div class="terminal-content">
@@ -2018,7 +2072,7 @@
                 <button type="button" class="suggestion" onclick="askSuggestion('Help me design a welcome series')">› Welcome sequences</button>
                 <button type="button" class="suggestion" onclick="askSuggestion('How do I prevent emails going to spam?')">› Spam prevention</button>
               </div>
-              <div class="boot-line ready">$ ask me anything</div>
+              <div class="boot-line ready">$ click a button above ↑ or type your question below ↓</div>
             </div>
             <div id="chat-messages"></div>
           </div>
