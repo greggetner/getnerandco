@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Free ActiveCampaign Audit — Hyper-Pareto Analysis | Greg Getner</title>
+<meta name="description" content="Discover your critical 10% — the small set of automations, emails, and segments driving most of your ActiveCampaign results. Free Hyper-Pareto audit for qualifying accounts." />
+<link rel="canonical" href="https://getner.ai/audit/" />
+
+<meta property="og:title" content="Free ActiveCampaign Audit — Hyper-Pareto Analysis" />
+<meta property="og:description" content="Discover your critical 10% — the small set of activities driving most of your ActiveCampaign results." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://getner.ai/audit/" />
+
+<link rel="icon" type="image/svg+xml" href="/assets/favicons/favicon.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicons/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicons/favicon-16.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/favicons/apple-touch-icon.png" />
+<link rel="shortcut icon" href="/assets/favicons/favicon.ico" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..700&family=Inter+Tight:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="/blog/blog.css" />
+
+<style>
+  .audit-container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 56px 24px 80px;
+  }
+
+  section.audit-section { margin: 0 0 80px; }
+  section.audit-section:last-of-type { margin-bottom: 0; }
+
+  /* Hero */
+  .audit-hero { text-align: center; padding-top: 24px; }
+
+  .audit-hero .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--rust);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 14px;
+  }
+
+  .audit-hero h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(40px, 6.4vw, 64px);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin: 0 0 18px;
+  }
+
+  .audit-hero .subhead {
+    font-size: 20px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 680px;
+    margin: 0 auto 32px;
+  }
+
+  .audit-hero .hero-bullets {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto 40px;
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: 820px;
+  }
+
+  .audit-hero .hero-bullets li {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink);
+    background: var(--paper-deep);
+    border: 1px solid var(--line);
+    padding: 10px 16px;
+    border-radius: 999px;
+  }
+
+  .audit-hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 32px;
+    background: var(--rust);
+    color: var(--paper);
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    transition: background-color 0.2s, transform 0.2s;
+  }
+
+  .audit-hero-cta:hover {
+    background: var(--rust-deep);
+    color: var(--paper);
+    transform: translateY(-1px);
+    text-decoration: none;
+  }
+
+  .audit-eligibility {
+    margin: 20px auto 0;
+    max-width: 560px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.55;
+    color: var(--muted);
+    letter-spacing: 0.2px;
+  }
+
+  .audit-eligibility a {
+    color: var(--rust);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .audit-eligibility a:hover { color: var(--rust-deep); }
+
+  /* Section headers */
+  section.audit-section > h2 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(28px, 4vw, 38px);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    margin: 0 0 18px;
+    text-align: center;
+  }
+
+  section.audit-section > p.intro {
+    font-size: 17px;
+    color: var(--ink-soft);
+    max-width: 680px;
+    margin: 0 auto 36px;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  /* What it is */
+  .method-panel {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 12px;
+    padding: 40px;
+    max-width: 780px;
+    margin: 0 auto;
+  }
+
+  .method-panel .kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ochre);
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .method-panel h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 600;
+    margin: 0 0 16px;
+    line-height: 1.2;
+  }
+
+  .method-panel p {
+    font-size: 17px;
+    line-height: 1.6;
+    margin: 0 0 14px;
+    opacity: 0.9;
+  }
+
+  .method-panel p:last-child { margin-bottom: 0; }
+
+  /* Social proof */
+  .proof-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+  }
+
+  .proof {
+    background: var(--paper-deep);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .proof blockquote {
+    margin: 0 0 16px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+
+  .proof .result {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--rust);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 600;
+  }
+
+  .proof cite {
+    margin-top: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    font-style: normal;
+    letter-spacing: 0.3px;
+  }
+
+  /* Included list */
+  .included-list {
+    max-width: 640px;
+    margin: 0 auto;
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 14px;
+  }
+
+  .included-list li {
+    font-size: 17px;
+    color: var(--ink);
+    padding: 14px 18px;
+    border: 1.5px solid var(--line);
+    background: var(--paper-deep);
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .included-list li::before {
+    content: "✓";
+    color: var(--rust);
+    font-weight: 800;
+    font-size: 18px;
+    line-height: 1.5;
+  }
+
+  .included-list li strong {
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .included-list li span {
+    display: block;
+    font-size: 14px;
+    color: var(--ink-soft);
+    font-weight: 400;
+  }
+
+  /* How it works */
+  .process-grid {
+    display: grid;
+    gap: 22px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+
+  .process-card {
+    background: var(--paper);
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 28px;
+  }
+
+  .process-card .step-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--rust);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .process-card h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 10px;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .process-card p {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  /* Form wrapper */
+  .audit-form-wrapper {
+    background: var(--paper-deep);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 40px;
+  }
+
+  @media (max-width: 640px) {
+    .audit-form-wrapper { padding: 28px 20px; }
+  }
+
+  /* Non-AC gate notice */
+  .platform-gate {
+    display: none;
+    margin-top: 14px;
+    padding: 16px 18px;
+    background: rgba(206, 143, 63, 0.14);
+    border: 1px solid rgba(180, 90, 35, 0.35);
+    border-radius: 8px;
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .platform-gate.visible { display: block; }
+
+  .platform-gate strong { display: block; margin-bottom: 4px; }
+
+  .platform-gate a {
+    color: var(--rust);
+    text-decoration: underline;
+    font-weight: 600;
+  }
+
+  /* Footnote */
+  .audit-footnote {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 32px;
+  }
+</style>
+</head>
+<body>
+
+<header class="blog-masthead">
+  <a href="/" class="blog-masthead-brand">
+    <span class="blog-masthead-title">Getner &amp; AI</span>
+    <span class="blog-masthead-subtitle">Boutique ActiveCampaign Management</span>
+  </a>
+  <nav class="blog-masthead-nav">
+    <a href="/">Home</a>
+    <a href="/blog/">Blog</a>
+    <a href="/#apply">Apply</a>
+  </nav>
+</header>
+
+<main class="audit-container">
+
+  <!-- HERO -->
+  <section class="audit-section audit-hero">
+    <p class="eyebrow">Free ActiveCampaign Audit</p>
+    <h1>Discover What's Working and What's Not</h1>
+    <p class="subhead">Most ActiveCampaign accounts waste 90% of their effort on activities that barely move the needle. I'll identify the 10% of your setup — automations, email types, and segments — that's actually driving your results.</p>
+    <ul class="hero-bullets">
+      <li>✅ Your highest-impact automations</li>
+      <li>✅ Your most profitable email types</li>
+      <li>✅ Your top-converting segments</li>
+      <li>✅ Where to stop wasting effort</li>
+    </ul>
+    <a class="audit-hero-cta" href="#audit-form">Get my FREE audit →</a>
+    <p class="audit-eligibility">Audit is for existing ActiveCampaign accounts. On another platform? <a href="/free-migration/">Check the free migration service</a> or <a href="mailto:greg@getner.ai">email me</a> about a custom audit.</p>
+  </section>
+
+  <!-- METHODOLOGY -->
+  <section class="audit-section">
+    <div class="method-panel">
+      <div class="kicker">The Hyper-Pareto Principle</div>
+      <h3>Every account I've ever audited reveals the same pattern.</h3>
+      <p>Roughly 5–10% of your ActiveCampaign activity drives 90% of your results. Sometimes it's two emails in a welcome series. Sometimes it's a single segment. Sometimes it's three automations doing all the work while twelve others produce noise.</p>
+      <p>The Hyper-Pareto audit finds those concentration points so you can double down on what works and stop carrying the dead weight.</p>
+    </div>
+  </section>
+
+  <!-- SOCIAL PROOF -->
+  <section class="audit-section">
+    <h2>What clients find when they run this</h2>
+    <div class="proof-grid">
+      <div class="proof">
+        <div class="result">+67% revenue, 71% less work</div>
+        <blockquote>"Greg found that 2 of my 7 welcome emails generated 95% of my revenue. We killed the other 5 and doubled down on the winners."</blockquote>
+        <cite>— Course creator, ~$1.2M/yr</cite>
+      </div>
+      <div class="proof">
+        <div class="result">Same results, 75% less complexity</div>
+        <blockquote>"Only 3 of my 12 automations were driving 87% of conversions. We paused the other 9 and perfected the 3. Same revenue with a fraction of the moving parts."</blockquote>
+        <cite>— Business coach</cite>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INCLUDED -->
+  <section class="audit-section">
+    <h2>What your free audit includes</h2>
+    <ul class="included-list">
+      <li>
+        <div>
+          <strong>Overall health score (A–F)</strong>
+          <span>A quick read on where your program sits against the programs I typically see in your industry.</span>
+        </div>
+      </li>
+      <li>
+        <div>
+          <strong>Your Hyper-Pareto breakdown</strong>
+          <span>Which automations, email types, and segments are driving the bulk of your results — and which aren't pulling their weight.</span>
+        </div>
+      </li>
+      <li>
+        <div>
+          <strong>Industry-comparative analysis</strong>
+          <span>Where your numbers sit relative to programs of similar size and audience type.</span>
+        </div>
+      </li>
+      <li>
+        <div>
+          <strong>Top 3 concentration opportunities</strong>
+          <span>The three highest-leverage moves to make right now, ranked by likely impact.</span>
+        </div>
+      </li>
+      <li>
+        <div>
+          <strong>Basic deliverability check</strong>
+          <span>Authentication, bounce rates, list hygiene, send frequency — the vitals.</span>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="audit-section">
+    <h2>How the audit works</h2>
+    <p class="intro">Fully manual for now — I'll run the analysis by hand, looking at your account the same way I'd audit a paying client.</p>
+    <div class="process-grid">
+      <div class="process-card">
+        <div class="step-number">Step 01</div>
+        <h3>Tell me about your account</h3>
+        <p>Fill out the form below — three short questions plus your email. Takes 60 seconds.</p>
+      </div>
+      <div class="process-card">
+        <div class="step-number">Step 02</div>
+        <h3>I request access</h3>
+        <p>I'll email you within one business day with a short request for read-only access to your ActiveCampaign account.</p>
+      </div>
+      <div class="process-card">
+        <div class="step-number">Step 03</div>
+        <h3>I run the audit</h3>
+        <p>Hands-on review of your automations, segments, and email performance. Usually 2–3 business days from access.</p>
+      </div>
+      <div class="process-card">
+        <div class="step-number">Step 04</div>
+        <h3>You get your report</h3>
+        <p>PDF delivered to your inbox with your health score, Hyper-Pareto breakdown, and your top 3 concentration opportunities.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FORM -->
+  <section class="audit-section" id="audit-form">
+    <h2>Get my ActiveCampaign audit</h2>
+    <p class="intro">Three questions and I'll know if your account is a fit. If it is, I'll be in touch within one business day to request access.</p>
+
+    <div class="audit-form-wrapper">
+      <form
+        class="site-form theme-light"
+        id="audit-request-form"
+        name="audit-request"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+        novalidate
+      >
+        <input type="hidden" name="form-name" value="audit-request" />
+        <p class="bot-field"><label>Don't fill this out: <input name="bot-field" /></label></p>
+
+        <div class="form-row two-col">
+          <div class="form-field">
+            <label class="form-label" for="aud-name">Name<span class="required">*</span></label>
+            <input class="form-control" type="text" id="aud-name" name="name" required autocomplete="name" />
+            <span class="form-error" data-error-for="aud-name"></span>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="aud-email">Email<span class="required">*</span></label>
+            <input class="form-control" type="email" id="aud-email" name="email" required autocomplete="email" />
+            <span class="form-error" data-error-for="aud-email"></span>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label" for="aud-company">Company / Brand<span class="required">*</span></label>
+          <input class="form-control" type="text" id="aud-company" name="company" required autocomplete="organization" />
+          <span class="form-error" data-error-for="aud-company"></span>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label" for="aud-type">Type of business<span class="required">*</span></label>
+          <select class="form-control" id="aud-type" name="business_type" required>
+            <option value="">Select one…</option>
+            <option>Life / business coach</option>
+            <option>Course creator / online educator</option>
+            <option>E-commerce / retail brand</option>
+            <option>Software / SaaS company</option>
+            <option>Content creator / influencer</option>
+            <option>B2B service</option>
+            <option>Agency / service provider</option>
+            <option>Entertainment / music industry</option>
+            <option>Other</option>
+          </select>
+          <span class="form-error" data-error-for="aud-type"></span>
+        </div>
+
+        <div class="form-row two-col">
+          <div class="form-field">
+            <label class="form-label" for="aud-list">List size<span class="required">*</span></label>
+            <select class="form-control" id="aud-list" name="list_size" required>
+              <option value="">Select one…</option>
+              <option>Under 10K</option>
+              <option>10K–50K</option>
+              <option>50K–100K</option>
+              <option>100K–500K</option>
+              <option>500K–1M</option>
+              <option>1M–5M</option>
+              <option>5M–10M</option>
+              <option>10M+</option>
+            </select>
+            <span class="form-error" data-error-for="aud-list"></span>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="aud-goal">Primary goal<span class="required">*</span></label>
+            <select class="form-control" id="aud-goal" name="primary_goal" required>
+              <option value="">Select one…</option>
+              <option>Identify my highest-impact activities (Hyper-Pareto analysis)</option>
+              <option>Improve deliverability &amp; inbox placement</option>
+              <option>Increase email engagement (opens / clicks)</option>
+              <option>Generate more revenue from ActiveCampaign</option>
+              <option>Fix automation performance issues</option>
+              <option>Get an expert second opinion on my current setup</option>
+              <option>Other</option>
+            </select>
+            <span class="form-error" data-error-for="aud-goal"></span>
+          </div>
+        </div>
+
+        <button type="submit" class="form-submit">Request my free audit</button>
+      </form>
+
+      <div class="form-success" id="audit-success" aria-live="polite">
+        <h3>Thanks — your audit is queued.</h3>
+        <p>Here's what happens next:</p>
+        <p style="margin-top:10px;">
+          <strong>1.</strong> I'll email you within one business day from <code>greg@getner.ai</code> with a short request for read-only ActiveCampaign access.<br>
+          <strong>2.</strong> Once I have access, the Hyper-Pareto audit takes 2–3 business days.<br>
+          <strong>3.</strong> Your PDF report lands in your inbox — health score, concentration breakdown, top 3 moves to make.
+        </p>
+      </div>
+    </div>
+
+    <p class="audit-footnote">Read-only access only. I won't modify, send, or delete anything in your account.</p>
+  </section>
+
+</main>
+
+<footer class="blog-footer">
+  <div class="blog-footer-links">
+    <a href="/">Home</a>
+    <a href="/blog/">Blog</a>
+    <a href="/#apply">Apply</a>
+    <a href="/#contact">Contact</a>
+  </div>
+  <div>Built with ❤️ by Greg &amp; Claude. <span style="white-space: nowrap;">Deployed to Netlify.</span></div>
+  <div>&copy; 2026 Getner &amp; AI</div>
+</footer>
+
+<!-- Hidden static form for Netlify build-time detection -->
+<form name="audit-request" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input type="text" name="name" />
+  <input type="email" name="email" />
+  <input type="text" name="company" />
+  <input type="text" name="business_type" />
+  <input type="text" name="list_size" />
+  <input type="text" name="primary_goal" />
+  <input type="text" name="bot-field" />
+</form>
+
+<script>
+  (function () {
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    function setFieldError(field, message) {
+      const slot = document.querySelector(`[data-error-for="${field.id}"]`);
+      if (slot) slot.textContent = message || '';
+      if (message) field.setAttribute('aria-invalid', 'true');
+      else field.removeAttribute('aria-invalid');
+    }
+
+    function validateForm(form) {
+      let firstInvalid = null;
+      form.querySelectorAll('[required]').forEach(field => {
+        const v = (field.value || '').trim();
+        if (!v) {
+          setFieldError(field, 'Required');
+          if (!firstInvalid) firstInvalid = field;
+        } else if (field.type === 'email' && !EMAIL_RE.test(v)) {
+          setFieldError(field, 'Enter a valid email');
+          if (!firstInvalid) firstInvalid = field;
+        } else {
+          setFieldError(field, '');
+        }
+      });
+      if (firstInvalid) firstInvalid.focus();
+      return !firstInvalid;
+    }
+
+    function encodeFormData(form) {
+      const p = new URLSearchParams();
+      for (const [k, v] of new FormData(form).entries()) p.append(k, v);
+      return p.toString();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('audit-request-form');
+      if (!form) return;
+
+      const submitBtn = form.querySelector('.form-submit');
+
+      form.querySelectorAll('.form-control').forEach(f => {
+        f.addEventListener('input', () => setFieldError(f, ''));
+        f.addEventListener('change', () => setFieldError(f, ''));
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (submitBtn.disabled) return;
+        if (!validateForm(form)) return;
+        const originalLabel = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending…';
+        try {
+          const res = await fetch('/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: encodeFormData(form)
+          });
+          if (!res.ok) throw new Error('Server error: ' + res.status);
+          form.style.display = 'none';
+          const success = document.getElementById('audit-success');
+          if (success) {
+            success.classList.add('visible');
+            success.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        } catch (err) {
+          console.error('Audit form submit failed:', err);
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalLabel;
+          alert('Something went wrong submitting the form. Please try again or email greg@getner.ai directly.');
+        }
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
